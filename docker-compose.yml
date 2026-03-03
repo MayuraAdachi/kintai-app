@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  # Nginx
+  nginx:
+    image: nginx:alpine
+    container_name: kintai_nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./src:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php
+    networks:
+      - kintai_network
+
+  # PHP-FPM
+  php:
+    build:
+      context: ./docker/php
+      dockerfile: Dockerfile
+    container_name: kintai_php
+    volumes:
+      - ./src:/var/www/html
+    depends_on:
+      - mysql
+    networks:
+      - kintai_network
+    environment:
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=kintai_db
+      - DB_USERNAME=kintai_user
+      - DB_PASSWORD=kintai_password
+
+  # MySQL
+  mysql:
+    image: mysql:8.0
+    container_name: kintai_mysql
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: kintai_db
+      MYSQL_USER: kintai_user
+      MYSQL_PASSWORD: kintai_password
+    networks:
+      - kintai_network
+
+  # phpMyAdmin (開発用)
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: kintai_phpmyadmin
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: kintai_user
+      PMA_PASSWORD: kintai_password
+    depends_on:
+      - mysql
+    networks:
+      - kintai_network
+
+volumes:
+  mysql_data:
+
+networks:
+  kintai_network:
+    driver: bridge
