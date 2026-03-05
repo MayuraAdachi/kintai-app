@@ -45,4 +45,10 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    // 勤怠記録とのリレーション
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class);
+    }
 }

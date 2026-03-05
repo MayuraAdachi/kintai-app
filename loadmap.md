@@ -96,8 +96,39 @@ docker compose exec php php artisan migrate
 - attendancesテーブル作成
 - マイグレーション確認
 
+#### 実施した作業内容
+
+**使用したコマンド**
+```bash
+# attendancesテーブル用マイグレーションファイル作成
+docker compose exec php php artisan make:migration create_attendances_table
+```
+
+- マイグレーションファイル内容：user_id, date, clock_in_time, clock_out_time, break_time_minutes, notes, status
+- 全テーブルのカラムにコメント追加（日本語）
+- データベース設定をSQLiteからMySQLに変更
+- マイグレーション実行でattendancesテーブル作成完了
+
 ### Day5
 - 出勤機能の実装
+
+#### 実施した作業内容
+
+**使用したコマンド**
+```bash
+# Attendanceモデル作成
+docker compose exec php php artisan make:model Attendance
+
+# AttendanceController作成
+docker compose exec php php artisan make:controller AttendanceController
+```
+
+**実装した機能**
+- Attendanceモデル：fillable設定、Userとのリレーション
+- AttendanceController：index()で今日の勤怠情報取得、clockIn()で出勤処理
+- ルーティング：/dashboardでAttendanceController@index、POST /attendance/clock-inで出勤
+- ダッシュボード画面：今日の勤怠状況表示、出勤ボタン（条件付き表示）
+- 重複出勤防止、成功・エラーメッセージ表示
 
 ### Day6
 - 退勤機能の実装
