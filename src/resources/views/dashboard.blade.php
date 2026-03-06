@@ -19,25 +19,52 @@
                         {{ session('error') }}
                     </div>
                     @endif
-                    <form method="POST" action="{{ route('attendance.clockIn') }}">
-                        @csrf
-                        <div class="flex items-center justify-end mt-4">
-                            @if ($todayAttendance)
-                            <p class="text-sm text-gray-600 dark:text-gray-400">
-                                出勤時間 {{ $todayAttendance->clock_in_time ? \Carbon\Carbon::parse($todayAttendance->clock_in_time)->format('H:i') : '未出勤' }} / 退勤時間 {{ $todayAttendance->clock_out_time ? \Carbon\Carbon::parse($todayAttendance->clock_out_time)->format('H:i') : '未退勤' }}
-                            </p>
-                            @else
-                            <p class="text-sm text-gray-600 dark:text-gray-400">
-                                今日の勤怠情報はまだありません。
-                            </p>
-                            @endif
-                            @if (!$todayAttendance || !$todayAttendance->clock_in_time)
-                            <x-primary-button class="ms-3">
+
+                    <!-- 今日の勤怠情報表示 -->
+                    <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        <h3 class="text-lg font-medium mb-3">今日の勤怠情報</h3>
+                        @if ($todayAttendance)
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <span class="text-sm text-gray-600 dark:text-gray-400">出勤時間：</span>
+                                <span class="font-medium">
+                                    {{ $todayAttendance->clock_in_time ? \Carbon\Carbon::parse($todayAttendance->clock_in_time)->format('H:i') : '未出勤' }}
+                                </span>
+                            </div>
+                            <div>
+                                <span class="text-sm text-gray-600 dark:text-gray-400">退勤時間：</span>
+                                <span class="font-medium">
+                                    {{ $todayAttendance->clock_out_time ? \Carbon\Carbon::parse($todayAttendance->clock_out_time)->format('H:i') : '未退勤' }}
+                                </span>
+                            </div>
+                        </div>
+                        @else
+                        <p class="text-sm text-gray-600 dark:text-gray-400">
+                            今日の勤怠情報はまだありません。
+                        </p>
+                        @endif
+                    </div>
+
+                    <!-- 打刻ボタン -->
+                    <div class="flex gap-4 justify-center">
+                        @if (!$todayAttendance || !$todayAttendance->clock_in_time)
+                        <form method="POST" action="{{ route('attendance.clockIn') }}">
+                            @csrf
+                            <x-primary-button class="px-8 py-3 text-lg">
                                 {{ __('出勤') }}
                             </x-primary-button>
-                            @endif
-                        </div>
-                    </form>
+                        </form>
+                        @endif
+
+                        @if ($todayAttendance && $todayAttendance->clock_in_time && !$todayAttendance->clock_out_time)
+                        <form method="POST" action="{{ route('attendance.clockOut') }}">
+                            @csrf
+                            <x-primary-button class="px-8 py-3 text-lg bg-red-600 hover:bg-red-700 focus:bg-red-700 active:bg-red-900 focus:ring-red-500">
+                                {{ __('退勤') }}
+                            </x-primary-button>
+                        </form>
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>

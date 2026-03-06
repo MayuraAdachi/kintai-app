@@ -47,4 +47,35 @@ class AttendanceController extends Controller
             return redirect()->back()->with('error', '出勤処理中にエラーが発生しました。');
         }
     }
+
+    /**
+     * 退勤処理
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function clockOut()
+    {
+        $today = Carbon::today();
+        $attendance = Attendance::where('user_id', Auth::id())
+            ->whereDate('date', $today)
+            ->first();
+
+        if (!$attendance || !$attendance->clock_in_time) {
+            return redirect()->back()->with('error', '出勤していません。');
+        }
+
+        if ($attendance->clock_out_time) {
+            return redirect()->back()->with('error', '既に退勤しています。');
+        }
+
+        try {
+            $attendance->update([
+                'clock_out_time' => Carbon::now(),
+            ]);
+
+            return redirect()->back()->with('success', '退勤しました。');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', '退勤処理中にエラーが発生しました。');
+        }
+    }
 }

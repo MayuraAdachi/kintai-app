@@ -15,6 +15,7 @@ Route::get('/dashboard', [AttendanceController::class, 'index'])->middleware(['a
 Route::middleware('auth')->group(function () {
     // 勤怠管理
     Route::post('/attendance/clock-in', [AttendanceController::class, 'clockIn'])->name('attendance.clockIn');
+    Route::post('/attendance/clock-out', [AttendanceController::class, 'clockOut'])->name('attendance.clockOut');
 
     // プロフィール管理
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
